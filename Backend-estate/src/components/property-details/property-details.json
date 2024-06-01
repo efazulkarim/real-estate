@@ -1,0 +1,33 @@
+{
+  "collectionName": "components_property_details_property_details",
+  "info": {
+    "displayName": "propertyDetails"
+  },
+  "options": {},
+  "attributes": {
+    "propertyId": {
+      "type": "string"
+    },
+    "area": {
+      "type": "integer"
+    },
+    "propertyStatus": {
+      "type": "enumeration",
+      "enum": [
+        "\"For Sale\", \"For Rent\""
+      ]
+    },
+    "rooms": {
+      "type": "integer"
+    },
+    "bedrooms": {
+      "type": "integer"
+    },
+    "baths": {
+      "type": "integer"
+    },
+    "createdYear": {
+      "type": "integer"
+    }
+  }
+}

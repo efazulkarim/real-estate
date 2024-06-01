@@ -1,0 +1,31 @@
+{
+  "collectionName": "components_variation_variations",
+  "info": {
+    "displayName": "variation"
+  },
+  "options": {},
+  "attributes": {
+    "color": {
+      "type": "string"
+    },
+    "colorCode": {
+      "type": "string"
+    },
+    "image": {
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ],
+      "type": "media",
+      "multiple": true
+    },
+    "size": {
+      "displayName": "size",
+      "type": "component",
+      "repeatable": false,
+      "component": "size.size"
+    }
+  }
+}
