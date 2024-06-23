@@ -1,27 +1,48 @@
 import { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { LayoutOne } from "@/layouts";
 import { Container, Row, Col } from "react-bootstrap";
-import {
-  FaArrowRight,
-  FaArrowLeft,
-  FaPlay,
-  FaSearch,
-  FaRegEnvelopeOpen,
-  FaPhoneAlt,
-} from "react-icons/fa";
-
+import { signUp } from "../slices/authSlice";
 import ShopBreadCrumb from "@/components/breadCrumbs/shop";
-
 import CallToAction from "@/components/callToAction";
 import Link from "next/link";
 
 function Register() {
+  const [formData, setFormData] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+  });
+  const dispatch = useDispatch();
+  const { loading, error } = useSelector((state) => state.auth);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({
+      ...formData,
+      [name]: value,
+    });
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const { firstName, lastName, email, password, confirmPassword } = formData;
+
+    if (password !== confirmPassword) {
+      alert("Passwords do not match");
+      return;
+    }
+
+    dispatch(signUp({ email, password, firstName, lastName }));
+  };
+
   return (
     <>
       <LayoutOne topbar={true}>
         <ShopBreadCrumb title="Account" sectionPace="" currentSlug="Register" />
 
-        {/* <!-- LOGIN AREA START (Register) --> */}
         <div className="ltn__login-area pb-110">
           <Container>
             <Row>
@@ -32,8 +53,7 @@ function Register() {
                     Your Account
                   </h1>
                   <p>
-                    Lorem ipsum dolor, sit amet consectetur adipisicing elit.{" "}
-                    <br />
+                    Lorem ipsum dolor, sit amet consectetur adipisicing elit. <br />
                     Sit aliquid, Non distinctio vel iste.
                   </p>
                 </div>
@@ -42,27 +62,41 @@ function Register() {
             <Row>
               <Col xs={12} lg={{ span: 6, offset: 3 }}>
                 <div className="account-login-inner">
-                  <form action="#" className="ltn__form-box contact-form-box">
+                  <form onSubmit={handleSubmit} className="ltn__form-box contact-form-box">
                     <input
                       type="text"
-                      name="firstname"
+                      name="firstName"
                       placeholder="First Name"
+                      value={formData.firstName}
+                      onChange={handleChange}
                     />
                     <input
                       type="text"
-                      name="lastname"
+                      name="lastName"
                       placeholder="Last Name"
+                      value={formData.lastName}
+                      onChange={handleChange}
                     />
-                    <input type="text" name="email" placeholder="Email*" />
+                    <input
+                      type="text"
+                      name="email"
+                      placeholder="Email*"
+                      value={formData.email}
+                      onChange={handleChange}
+                    />
                     <input
                       type="password"
                       name="password"
                       placeholder="Password*"
+                      value={formData.password}
+                      onChange={handleChange}
                     />
                     <input
                       type="password"
-                      name="confirmpassword"
+                      name="confirmPassword"
                       placeholder="Confirm Password*"
+                      value={formData.confirmPassword}
+                      onChange={handleChange}
                     />
                     <label className="checkbox-inline">
                       <input type="checkbox" value="" />I consent to Herboil
@@ -79,11 +113,13 @@ function Register() {
                       <button
                         className="theme-btn-1 btn reverse-color btn-block"
                         type="submit"
+                        disabled={loading}
                       >
-                        CREATE ACCOUNT
+                        {loading ? "Creating Account..." : "CREATE ACCOUNT"}
                       </button>
                     </div>
                   </form>
+                  {error && <p style={{ color: "red" }}>{error}</p>}
                   <div className="by-agree text-center">
                     <p>By creating an account, you agree to our:</p>
                     <p>
@@ -101,7 +137,6 @@ function Register() {
             </Row>
           </Container>
         </div>
-        {/* <!-- LOGIN AREA END --> */}
 
         <div className="ltn__call-to-action-area call-to-action-6 before-bg-bottom">
           <Container>

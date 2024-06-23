@@ -6,12 +6,16 @@ import productReducer from './slices/product-slice';
 import cartReducer from './slices/cart-slice';
 import wishlistReducer from './slices/wishlist-slice';
 import compareReducer from './slices/compare-slice';
+import authReducer from './slices/authSlice';
+
 
 const combinedReducer = combineReducers({
     product: productReducer,
     cart: cartReducer,
+    auth: authReducer,
     wishlist: wishlistReducer,
-    compare: compareReducer
+    compare: compareReducer,
+
 })
 
 const makeStore = ({ isServer }) => {
