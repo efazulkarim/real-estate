@@ -14,8 +14,7 @@ const combinedReducer = combineReducers({
     cart: cartReducer,
     auth: authReducer,
     wishlist: wishlistReducer,
-    compare: compareReducer,
-
+    compare: compareReducer
 })
 
 const makeStore = ({ isServer }) => {

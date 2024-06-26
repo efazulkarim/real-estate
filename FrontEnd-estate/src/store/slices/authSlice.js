@@ -27,7 +27,6 @@ export const signOut = createAsyncThunk(
   }
 );
 
-
 export const signUp = createAsyncThunk(
   'auth/signUp',
   async ({ email, password, firstName, lastName }, { rejectWithValue }) => {
@@ -36,9 +35,9 @@ export const signUp = createAsyncThunk(
       if (error) throw error;
 
       // Optionally, you can update the user's profile with additional data
-      await supabase
-        .from('profiles')
-        .insert([{ id: user.id, firstName, lastName }]);
+      /*  await supabase
+         .from('profiles')
+         .insert([{ id: user.id, firstName, lastName }]); */
 
       return user;
     } catch (error) {
@@ -56,9 +55,31 @@ const authSlice = createSlice({
   },
   reducers: {},
   extraReducers: (builder) => {
-    // Existing signIn and signOut reducers...
-
     builder
+      .addCase(signIn.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(signIn.fulfilled, (state, action) => {
+        state.loading = false;
+        state.user = action.payload;
+      })
+      .addCase(signIn.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(signOut.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(signOut.fulfilled, (state) => {
+        state.loading = false;
+        state.user = null;
+      })
+      .addCase(signOut.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
       .addCase(signUp.pending, (state) => {
         state.loading = true;
         state.error = null;

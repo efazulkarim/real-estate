@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { LayoutOne } from "@/layouts";
 import { Container, Row, Col } from "react-bootstrap";
-import { signUp } from "../slices/authSlice";
+import { signUp } from "@/store/slices/authSlice";
 import ShopBreadCrumb from "@/components/breadCrumbs/shop";
 import CallToAction from "@/components/callToAction";
 import Link from "next/link";

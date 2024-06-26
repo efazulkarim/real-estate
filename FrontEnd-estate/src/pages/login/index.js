@@ -5,7 +5,7 @@ import { Container, Row, Col } from "react-bootstrap";
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
 import { supabase } from "@/supabaseClient";
-import { signIn } from "../slices/authSlice";
+import { signIn } from "@/store/slices/authSlice";
 import ShopBreadCrumb from "@/components/breadCrumbs/shop";
 import CallToAction from "@/components/callToAction";
 import Link from "next/link";
