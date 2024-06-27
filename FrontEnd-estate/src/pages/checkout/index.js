@@ -30,10 +30,12 @@ const CheckoutForm = () => {
   const [clientSecret, setClientSecret] = useState("");
 
   useEffect(() => {
-    // Create PaymentIntent as soon as the page loads
     axios.post("/api/create-payment-intent", { amount: 63300 }) // Example amount in cents
       .then(res => {
         setClientSecret(res.data.clientSecret);
+      })
+      .catch(err => {
+        console.error("Error creating payment intent:", err);
       });
   }, []);
 
