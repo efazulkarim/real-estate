@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { LayoutOne } from "@/layouts";
 import { Container, Row, Col, Form } from "react-bootstrap";
 import ShopBreadCrumb from "@/components/breadCrumbs/shop";
@@ -14,22 +14,91 @@ import {
   FaPhoneAlt,
 } from "react-icons/fa";
 import Link from "next/link";
+import { loadStripe } from "@stripe/stripe-js";
+import { Elements, CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
+import axios from "axios";
 
-const Wishlist = () => {
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY);
+
+const CheckoutForm = () => {
+  const stripe = useStripe();
+  const elements = useElements();
+  const [succeeded, setSucceeded] = useState(false);
+  const [error, setError] = useState(null);
+  const [processing, setProcessing] = useState(false);
+  const [disabled, setDisabled] = useState(true);
+  const [clientSecret, setClientSecret] = useState("");
+
+  useEffect(() => {
+    // Create PaymentIntent as soon as the page loads
+    axios.post("/api/create-payment-intent", { amount: 63300 }) // Example amount in cents
+      .then(res => {
+        setClientSecret(res.data.clientSecret);
+      });
+  }, []);
+
+  const handleChange = async (event) => {
+    setDisabled(event.empty);
+    setError(event.error ? event.error.message : "");
+  };
+
+  const handleSubmit = async (ev) => {
+    ev.preventDefault();
+    setProcessing(true);
+
+    const payload = await stripe.confirmCardPayment(clientSecret, {
+      payment_method: {
+        card: elements.getElement(CardElement),
+      },
+    });
+
+    if (payload.error) {
+      setError(`Payment failed ${payload.error.message}`);
+      setProcessing(false);
+    } else {
+      setError(null);
+      setProcessing(false);
+      setSucceeded(true);
+    }
+  };
+
+  return (
+    <form id="payment-form" onSubmit={handleSubmit}>
+      <CardElement id="card-element" onChange={handleChange} />
+      <button
+        disabled={processing || disabled || succeeded}
+        id="submit"
+        className="btn theme-btn-1 btn-effect-1 text-uppercase"
+      >
+        <span id="button-text">
+          {processing ? <div className="spinner" id="spinner"></div> : "Pay now"}
+        </span>
+      </button>
+      {error && (
+        <div className="card-error" role="alert">
+          {error}
+        </div>
+      )}
+      {succeeded && (
+        <p className="result-message">
+          Payment succeeded, see the result in your
+          <a href={`https://dashboard.stripe.com/test/payments`}>
+            Stripe dashboard.
+          </a> Refresh the page to pay again.
+        </p>
+      )}
+    </form>
+  );
+};
+
+const Checkout = () => {
   const [open, setOpen] = useState(false);
   const [vissible, setVissible] = useState(false);
+
   return (
     <>
       <LayoutOne topbar={true}>
-        {/* <!-- BREADCRUMB AREA START --> */}
-        <ShopBreadCrumb
-          title="Checkout"
-          sectionPace=""
-          currentSlug="Checkout"
-        />
-        {/* <!-- BREADCRUMB AREA END --> */}
-
-        {/* <!-- WISHLIST AREA START --> */}
+        <ShopBreadCrumb title="Checkout" sectionPace="" currentSlug="Checkout" />
         <div className="ltn__checkout-area mb-105">
           <Container>
             <Row>
@@ -46,14 +115,13 @@ const Wishlist = () => {
                         Click here to login
                       </button>
                     </h5>
-
                     <Collapse in={open}>
                       <div
                         id="ltn__returning-customer-login"
                         className="collapse ltn__checkout-single-content-info"
                       >
                         <div className="ltn_coupon-code-form ltn__form-box">
-                          <p>Please login your accont.</p>
+                          <p>Please login your account.</p>
                           <form action="#">
                             <div className="row">
                               <div className="col-md-6">
@@ -100,7 +168,6 @@ const Wishlist = () => {
                         Click here to enter your code
                       </button>
                     </h5>
-
                     <Collapse in={vissible}>
                       <div
                         id="ltn__coupon-code"
@@ -286,36 +353,9 @@ const Wishlist = () => {
               <Col xs={12} lg={6}>
                 <div className="ltn__checkout-payment-method mt-50">
                   <h4 className="title-2">Payment Method</h4>
-
-                  <Accordion defaultActiveKey="2">
-                    <Accordion.Item eventKey="1">
-                      <Accordion.Header> Check payments</Accordion.Header>
-                      <Accordion.Body>
-                        <p>
-                          Please send a check to Store Name, Store Street, Store
-                          Town, Store State / County, Store Postcode.
-                        </p>
-                      </Accordion.Body>
-                    </Accordion.Item>
-
-                    <Accordion.Item eventKey="2">
-                      <Accordion.Header>Cash on delivery </Accordion.Header>
-                      <Accordion.Body>
-                        <p>Pay with cash upon delivery.</p>
-                      </Accordion.Body>
-                    </Accordion.Item>
-                    <Accordion.Item eventKey="3">
-                      <Accordion.Header>
-                        PayPal <img src="/img/icons/payment-3.png" alt="#" />
-                      </Accordion.Header>
-                      <Accordion.Body>
-                        <p>
-                          Pay via PayPal; you can pay with your credit card if
-                          you don’t have a PayPal account.
-                        </p>
-                      </Accordion.Body>
-                    </Accordion.Item>
-                  </Accordion>
+                  <Elements stripe={stripePromise}>
+                    <CheckoutForm />
+                  </Elements>
                   <div className="ltn__payment-note mt-30 mb-30">
                     <p>
                       Your personal data will be used to process your order,
@@ -323,12 +363,6 @@ const Wishlist = () => {
                       other purposes described in our privacy policy.
                     </p>
                   </div>
-                  <button
-                    className="btn theme-btn-1 btn-effect-1 text-uppercase"
-                    type="submit"
-                  >
-                    Place order
-                  </button>
                 </div>
               </Col>
               <Col xs={12} lg={6}>
@@ -377,8 +411,6 @@ const Wishlist = () => {
             </Row>
           </Container>
         </div>
-        {/* <!-- WISHLIST AREA START --> */}
-
         <div className="ltn__call-to-action-area call-to-action-6 before-bg-bottom">
           <Container>
             <Row>
@@ -393,4 +425,4 @@ const Wishlist = () => {
   );
 };
 
-export default Wishlist;
+export default Checkout;

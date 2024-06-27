@@ -7,7 +7,7 @@ import ShopBreadCrumb from '@/components/breadCrumbs/shop';
 import CallToAction from '@/components/callToAction';
 import Link from 'next/link';
 import ProfileInfo from '@/components/ProfileInfo';
-import PropertyInfo from '@/components/PropertyInfo';
+/* import PropertyInfo from '@/components/PropertyInfo'; */
 import { LayoutOne } from "@/layouts";
 
 function MyAccount() {
@@ -95,12 +95,12 @@ function MyAccount() {
                           <Tab.Pane eventKey="profile">
                             <ProfileInfo user={user} />
                           </Tab.Pane>
-                          <Tab.Pane eventKey="properties">
+                          {/* <Tab.Pane eventKey="properties">
                             <PropertyInfo properties={user.properties} />
                           </Tab.Pane>
                           <Tab.Pane eventKey="favorites">
                             <PropertyInfo properties={user.favoriteProperties} />
-                          </Tab.Pane>
+                          </Tab.Pane> */}
                         </Tab.Content>
                       </Col>
                     </Row>
